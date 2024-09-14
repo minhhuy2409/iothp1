@@ -1,82 +1,106 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-// Hàm chuyển đổi chiều cao sang mét
-double convertHeightToMeters(double height) {
-    if (height >= 30.0 && height <= 300.0) {
-        printf("Đơn vị nhận diện: cm\n");
-        return height / 100.0;  // cm sang mét
-    } else if (height > 3.0 && height <= 10.0) {
-        printf("Đơn vị nhận diện: feet\n");
-        return height * 0.3048;  // feet sang mét
-    } else {
-        printf("Đơn vị nhận diện: mét\n");
-        return height;  // đã là mét
+// Chuyển đổi chiều cao từ m sang cm nếu cần
+double convertHeightToCm(double height) {
+    if (height < 10) {  // Giả sử nếu nhập chiều cao dưới 10 thì đơn vị là mét
+        height *= 100;  // Chuyển từ m sang cm
     }
+    return height;  // Nếu nhập bằng cm thì không cần chuyển đổi
 }
 
-// Hàm chuyển đổi cân nặng sang kilogram
-double convertWeightToKg(double weight) {
-    if (weight > 100.0) {
-        printf("Đơn vị nhận diện: pound\n");
-        return weight * 0.453592;  // pound sang kilogram
-    } else {
-        printf("Đơn vị nhận diện: kilogram\n");
-        return weight;  // đã là kilogram
-    }
-}
-
+// Tính chỉ số BMI
 double calculateBMI(double weight, double height) {
-    return weight / (height * height);
+    return weight / ((height / 100) * (height / 100));  // Chuyển đổi chiều cao từ cm sang m để tính BMI
 }
 
-// Hàm đánh giá mức độ BMI
-void evaluateBMI(double bmi) {
-    if (bmi < 18.5) {
-        printf("Bạn thuộc nhóm: Thiếu cân\n");
-    } else if (bmi >= 18.5 && bmi < 25.0) {
-        printf("Bạn thuộc nhóm: Bình thường (Cân nặng khỏe mạnh)\n");
-    } else if (bmi >= 25.0 && bmi < 30.0) {
-        printf("Bạn thuộc nhóm: Thừa cân\n");
-    } else if (bmi >= 30.0 && bmi < 35.0) {
-        printf("Bạn thuộc nhóm: Béo phì độ 1\n");
-    } else if (bmi >= 35.0 && bmi < 40.0) {
-        printf("Bạn thuộc nhóm: Béo phì độ 2\n");
+// Đánh giá chỉ số BMI dựa trên giới tính
+void evaluateBMI(double bmi, char gender) {
+    if (gender == 'M' || gender == 'm') {
+        // Đánh giá cho nam
+        if (bmi < 18.5) {
+            printf("Bạn bị thiếu cân.\n");
+        } else if (bmi >= 18.5 && bmi < 24.9) {
+            printf("Bạn có cân nặng bình thường.\n");
+        } else if (bmi >= 25 && bmi < 29.9) {
+            printf("Bạn thừa cân.\n");
+        } else {
+            printf("Bạn béo phì.\n");
+        }
+    } else if (gender == 'F' || gender == 'f') {
+        // Đánh giá cho nữ
+        if (bmi < 18.5) {
+            printf("Bạn bị thiếu cân.\n");
+        } else if (bmi >= 18.5 && bmi < 24.9) {
+            printf("Bạn có cân nặng bình thường.\n");
+        } else if (bmi >= 25 && bmi < 29.9) {
+            printf("Bạn thừa cân.\n");
+        } else {
+            printf("Bạn béo phì.\n");
+        }
     } else {
-        printf("Bạn thuộc nhóm: Béo phì độ 3 (Nguy hiểm)\n");
+        printf("Giới tính không hợp lệ.\n");
     }
 }
 
-void suggestExercises(char areas[][100], int areasCount, char exercises[][200]) {
-    int i = 0;
-    for (int j = 0; j < areasCount; j++) {
-        if (areas[j][0] == 'b' && areas[j][1] == 'u') {
-            sprintf(exercises[i++], "Plank, gập bụng, nâng chân");
-        } else if (areas[j][0] == 'c' && areas[j][1] == 'h') {
-            sprintf(exercises[i++], "Squat, chùng chân, nâng bắp chân");
-        } else if (areas[j][0] == 'v' && areas[j][1] == 'a') {
-            sprintf(exercises[i++], "Đẩy tạ đôi qua vai, đứng 2 tay dang tạ đôi, nâng tạ đôi từng tay một");
-        } else if (areas[j][0] == 't' && areas[j][1] == 'a') {
-            sprintf(exercises[i++], "Chống đẩy, gập bắp tay, gập cơ tam đầu");
-        } else if (areas[j][0] == 'd' && areas[j][1] == 'u') {
-            sprintf(exercises[i++], "Đạp đùi, uốn cong gân kheo, căng cơ tứ đầu");
-        } else if (areas[j][0] == 'c' && areas[j][1] == 'o') {
-            sprintf(exercises[i++], "Xoay cổ, gập và duỗi cổ, nhún vai");
-        } else if (areas[j][0] == 'b' && areas[j][1] == 'o') {
-            sprintf(exercises[i++], "Burpees, Deadlifts, Pull-ups");
+// Chuyển đổi thời gian từ 12h AM/PM sang 24h
+void convertTo24HourFormat(char *timeInput, char *convertedTime) {
+    int hour, minute;
+    char period[3];
+
+    sscanf(timeInput, "%d:%d %s", &hour, &minute, period);
+
+    if (strcmp(period, "PM") == 0 && hour != 12) {
+        hour += 12;
+    } else if (strcmp(period, "AM") == 0 && hour == 12) {
+        hour = 0;
+    }
+
+    sprintf(convertedTime, "%02d:%02d", hour, minute);
+}
+
+// Gợi ý bài tập dựa trên các vùng mục tiêu
+void suggestExercises(char selectedAreas[][100], int areasCount, char exercises[][200]) {
+    for (int i = 0; i < areasCount; i++) {
+        if (strcmp(selectedAreas[i], "bung") == 0) {
+            strcpy(exercises[i], "Plank, gập bụng, nâng chân");
+        } else if (strcmp(selectedAreas[i], "chan") == 0) {
+            strcpy(exercises[i], "Squat, chùng chân, nâng bắp chân");
+        } else if (strcmp(selectedAreas[i], "vai") == 0) {
+            strcpy(exercises[i], "Đẩy tạ đôi qua vai, đứng 2 tay dang tạ đôi, nâng tạ đôi từng tay một");
+        } else if (strcmp(selectedAreas[i], "tay") == 0) {
+            strcpy(exercises[i], "Chống đẩy, gập bắp tay, gập cơ tam đầu");
+        } else if (strcmp(selectedAreas[i], "dui") == 0) {
+            strcpy(exercises[i], "Đạp đùi, uốn cong gân kheo, căng cơ tứ đầu");
+        } else if (strcmp(selectedAreas[i], "co") == 0) {
+            strcpy(exercises[i], "Xoay cổ, gập và duỗi cổ, nhún vai");
+        } else if (strcmp(selectedAreas[i], "body") == 0) {
+            strcpy(exercises[i], "Burpees, Deadlifts, Pull-ups");
         } else {
-            sprintf(exercises[i++], "Không có bài tập gợi ý cho bộ phận %s", areas[j]);
+            strcpy(exercises[i], "Không có bài tập gợi ý cho bộ phận này.");
         }
     }
 }
 
-void saveAndRemind(char *name, int age, double weight, double targetWeight, double bmi, char areas[][100], int areasCount, char *preferredTime) {
-    printf("Thông tin đã được lưu lại.\n");
-    printf("Chỉ số BMI của bạn là: %.2f\n", bmi);
-    evaluateBMI(bmi);  // Đánh giá BMI
-    printf("Nhắc nhở được thiết lập vào %s.\n", preferredTime);
+// Lưu thông tin người dùng và thiết lập nhắc nhở
+void saveAndRemind(char *name, int age, double weight, double targetWeight, double bmi, char selectedAreas[][100], int areasCount, char *convertedTime) {
+    printf("\nThông tin của bạn đã được lưu lại!\n");
+    printf("Tên: %s\n", name);
+    printf("Tuổi: %d\n", age);
+    printf("Cân nặng hiện tại: %.2f kg\n", weight);
+    printf("Mục tiêu cân nặng: %.2f kg\n", targetWeight);
+    printf("Chỉ số BMI: %.2f\n", bmi);
+
+    printf("Các vùng bạn muốn tập trung giảm cân:\n");
+    for (int i = 0; i < areasCount; i++) {
+        printf("- %s\n", selectedAreas[i]);
+    }
+
+    printf("Thời gian nhắc nhở: %s\n", convertedTime);
 }
 
+// Hiển thị menu các vùng mục tiêu
 void displayTargetAreaMenu() {
     printf("\nChọn các bộ phận bạn muốn giảm cân (nhập các số tương ứng, cách nhau bằng dấu phẩy):\n");
     printf("1. Bung\n");
@@ -89,42 +113,51 @@ void displayTargetAreaMenu() {
 }
 
 int main() {
-    char name[100];
+    printf("============================================\n");
+    printf("Chào mừng bạn đến với ứng dụng theo dõi sức khỏe!\n");
+    printf("Ứng dụng này giúp bạn theo dõi BMI và gợi ý bài tập phù hợp theo từng bộ phận cho bạn.\n");
+    printf("Hãy làm theo quy trình nhé.\n");
+    printf("============================================\n\n");
+
+    char name[100], gender;
     int age;
     double weight, targetWeight, height, bmi;
-    char preferredTime[100];
-    
+    char preferredTime[100], convertedTime[10];
+
     // Nhập tên
     printf("Nhập tên của bạn: ");
     fgets(name, sizeof(name), stdin);
-    for (int i = 0; name[i] != '\0'; i++) {  // Xóa newline
-        if (name[i] == '\n') name[i] = '\0';
-    }
+    name[strcspn(name, "\n")] = 0;  // Xóa ký tự newline
 
     // Nhập tuổi
     printf("Nhập tuổi của bạn: ");
     scanf("%d", &age);
 
+    // Nhập giới tính
+    printf("Nhập giới tính của bạn (M/F): ");
+    getchar();  // Xóa ký tự newline từ buffer trước khi nhập ký tự
+    scanf("%c", &gender);
+
     // Nhập cân nặng
-    printf("Nhập cân nặng của bạn: ");
+    printf("Nhập cân nặng của bạn (kg): ");
     scanf("%lf", &weight);
-    weight = convertWeightToKg(weight);
 
     // Nhập mục tiêu cân nặng
     printf("Nhập mục tiêu cân nặng của bạn (kg): ");
     scanf("%lf", &targetWeight);
 
     // Nhập chiều cao
-    printf("Nhập chiều cao của bạn: ");
+    printf("Nhập chiều cao của bạn (cm hoặc m): ");
     scanf("%lf", &height);
-    height = convertHeightToMeters(height);
+    height = convertHeightToCm(height);  // Chuyển đổi sang cm nếu nhập bằng mét
 
     // Tính toán BMI
     bmi = calculateBMI(weight, height);
     printf("Chỉ số BMI của bạn là: %.2f\n", bmi);
-    evaluateBMI(bmi);  // Đánh giá chỉ số BMI
+    evaluateBMI(bmi, gender);  // Đánh giá chỉ số BMI dựa trên giới tính
 
-    getchar();  // clear newline from buffer
+    getchar();  // Xóa ký tự newline từ buffer
+
     displayTargetAreaMenu();
 
     // Nhập các vùng mục tiêu
@@ -137,34 +170,40 @@ int main() {
     int areasCount = 0;
 
     // Tách các lựa chọn bằng dấu phẩy
-    for (int i = 0; targetAreasInput[i] != '\0'; i++) {
-        if (targetAreasInput[i] >= '1' && targetAreasInput[i] <= '7') {
-            int index = targetAreasInput[i] - '1';
-            for (int k = 0; areas[index][k] != '\0'; k++) {
-                selectedAreas[areasCount][k] = areas[index][k];
-            }
+    char *token = strtok(targetAreasInput, ",");
+    while (token != NULL) {
+        int index = atoi(token) - 1;
+        if (index >= 0 && index < 7) {
+            strcpy(selectedAreas[areasCount], areas[index]);
             areasCount++;
         }
+        token = strtok(NULL, ",");
     }
 
     // Nhập thời gian nhắc nhở
-    printf("Nhập thời gian trong ngày mà bạn muốn nhắc nhở: ");
+    printf("Nhập thời gian nhắc nhở (VD: 07:30 AM hoặc 19:30): ");
     fgets(preferredTime, sizeof(preferredTime), stdin);
-    for (int i = 0; preferredTime[i] != '\0'; i++) {  // Xóa newline
-        if (preferredTime[i] == '\n') preferredTime[i] = '\0';
+    preferredTime[strcspn(preferredTime, "\n")] = 0;  // Xóa ký tự newline
+
+    // Chuyển đổi thời gian sang dạng 24 giờ
+    if (strstr(preferredTime, "AM") != NULL || strstr(preferredTime, "PM") != NULL) {
+        convertTo24HourFormat(preferredTime, convertedTime);
+    } else {
+        strcpy(convertedTime, preferredTime);  // Nếu đã là 24 giờ thì không cần chuyển đổi
     }
 
     // Gợi ý bài tập
     char exercises[10][200];
     suggestExercises(selectedAreas, areasCount, exercises);
 
+    // Hiển thị gợi ý bài tập
     printf("\nGợi ý bài tập cho bạn:\n");
     for (int i = 0; i < areasCount; i++) {
         printf("%s: %s\n", selectedAreas[i], exercises[i]);
     }
 
-    // Lưu thông tin và nhắc nhở
-    saveAndRemind(name, age, weight, targetWeight, bmi, selectedAreas, areasCount, preferredTime);
+    // Lưu thông tin và thiết lập nhắc nhở
+    saveAndRemind(name, age, weight, targetWeight, bmi, selectedAreas, areasCount, convertedTime);
 
     return 0;
 }
